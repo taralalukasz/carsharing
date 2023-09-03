@@ -1,0 +1,16 @@
+#Stage 1
+FROM eclipse-temurin:17-jdk-alpine as stage1
+WORKDIR /workspace/app/sources/
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
+
+RUN ./mvnw install
+
+#Stage 2
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /workspace/app/jar
+COPY --from=stage1 /workspace/app/sources/target/carsharing-api-0.0.1-SNAPSHOT.jar /workspace/app/jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "carsharing-api-0.0.1-SNAPSHOT.jar"]
